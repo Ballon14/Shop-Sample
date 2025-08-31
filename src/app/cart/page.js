@@ -70,7 +70,14 @@ export default function CartPage() {
     }, [])
 
     const handleQuantityChange = async (cartItemId, newQuantity) => {
-        if (newQuantity < 1) return
+        if (newQuantity < 1) {
+            // If dropping to 0, remove from cart
+            const removed = await removeCartItem(cartItemId)
+            if (removed) {
+                setCartItems((prev) => prev.filter((i) => i.id !== cartItemId))
+                return
+            }
+        }
 
         const success = await updateCartItem(cartItemId, newQuantity)
         if (success) {
@@ -262,8 +269,14 @@ export default function CartPage() {
                                             {/* Product Image */}
                                             <div className="flex-shrink-0">
                                                 <img
-                                                    src={item.product.image}
-                                                    alt={item.product.name}
+                                                    src={
+                                                        item?.product?.image ||
+                                                        "/vercel.svg"
+                                                    }
+                                                    alt={
+                                                        item?.product?.name ||
+                                                        "Product"
+                                                    }
                                                     className="w-24 h-24 object-cover rounded-lg"
                                                 />
                                             </div>
@@ -273,38 +286,42 @@ export default function CartPage() {
                                                 <div className="flex justify-between">
                                                     <div>
                                                         <Link
-                                                            href={`/products/${item.product.id}`}
+                                                            href={`/products/${
+                                                                item?.product
+                                                                    ?.id ?? ""
+                                                            }`}
                                                         >
                                                             <h3 className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors">
-                                                                {
-                                                                    item.product
-                                                                        .name
-                                                                }
+                                                                {item?.product
+                                                                    ?.name ||
+                                                                    "Product"}
                                                             </h3>
                                                         </Link>
                                                         <p className="text-sm text-gray-500 mb-2">
-                                                            {item.product.brand}{" "}
+                                                            {item?.product
+                                                                ?.brand ||
+                                                                "-"}{" "}
                                                             •{" "}
-                                                            {
-                                                                item.product
-                                                                    .category
-                                                            }
+                                                            {item?.product
+                                                                ?.category ||
+                                                                "-"}
                                                         </p>
 
                                                         {/* Rating */}
                                                         <div className="flex items-center gap-1 mb-2">
                                                             <div className="flex items-center">
                                                                 {renderStars(
-                                                                    item.product
-                                                                        .rating
+                                                                    item
+                                                                        ?.product
+                                                                        ?.rating ??
+                                                                        0
                                                                 )}
                                                             </div>
                                                             <span className="text-sm text-gray-500">
                                                                 (
-                                                                {
-                                                                    item.product
-                                                                        .reviewCount
-                                                                }
+                                                                {item?.product
+                                                                    ?.reviewCount ??
+                                                                    0}
                                                                 )
                                                             </span>
                                                         </div>
@@ -313,24 +330,24 @@ export default function CartPage() {
                                                         <div className="flex items-center gap-2">
                                                             <span className="text-lg font-bold text-gray-900">
                                                                 $
-                                                                {
-                                                                    item.product
-                                                                        .price
-                                                                }
+                                                                {item?.product
+                                                                    ?.price ??
+                                                                    0}
                                                             </span>
-                                                            {item.product
-                                                                .originalPrice &&
-                                                                item.product
-                                                                    .originalPrice >
-                                                                    item.product
-                                                                        .price && (
+                                                            {item?.product
+                                                                ?.originalPrice &&
+                                                                item?.product
+                                                                    ?.originalPrice >
+                                                                    (item
+                                                                        ?.product
+                                                                        ?.price ??
+                                                                        0) && (
                                                                     <span className="text-sm text-gray-500 line-through">
                                                                         $
-                                                                        {
-                                                                            item
-                                                                                .product
-                                                                                .originalPrice
-                                                                        }
+                                                                        {item
+                                                                            ?.product
+                                                                            ?.originalPrice ??
+                                                                            0}
                                                                     </span>
                                                                 )}
                                                         </div>
@@ -347,11 +364,7 @@ export default function CartPage() {
                                                                             1
                                                                     )
                                                                 }
-                                                                disabled={
-                                                                    item.quantity <=
-                                                                    1
-                                                                }
-                                                                className="w-8 h-8 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                className="w-8 h-8 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-50"
                                                             >
                                                                 <svg
                                                                     className="w-4 h-4"
@@ -380,14 +393,7 @@ export default function CartPage() {
                                                                             1
                                                                     )
                                                                 }
-                                                                disabled={
-                                                                    item.quantity >=
-                                                                    (item
-                                                                        .product
-                                                                        .stock ||
-                                                                        10)
-                                                                }
-                                                                className="w-8 h-8 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                className="w-8 h-8 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-50"
                                                             >
                                                                 <svg
                                                                     className="w-4 h-4"
@@ -430,9 +436,16 @@ export default function CartPage() {
                                                         <span className="font-semibold text-gray-900">
                                                             $
                                                             {(
-                                                                item.product
-                                                                    .price *
-                                                                item.quantity
+                                                                Number(
+                                                                    item
+                                                                        ?.product
+                                                                        ?.price ??
+                                                                        0
+                                                                ) *
+                                                                Number(
+                                                                    item?.quantity ??
+                                                                        0
+                                                                )
                                                             ).toFixed(2)}
                                                         </span>
                                                     </div>
