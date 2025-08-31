@@ -1,0 +1,24 @@
+[
+  {
+    "id": 1,
+    "username": "admin",
+    "email": "admin@shophub.com",
+    "password": "hashed_password_here",
+    "role": "admin",
+    "firstName": "Admin",
+    "lastName": "User",
+    "createdAt": "2025-08-31T15:42:26.971Z",
+    "updatedAt": "2025-08-31T15:42:26.971Z"
+  },
+  {
+    "id": 2,
+    "username": "customer",
+    "email": "customer@example.com",
+    "password": "hashed_password_here",
+    "role": "customer",
+    "firstName": "John",
+    "lastName": "Doe",
+    "createdAt": "2025-08-31T15:42:26.971Z",
+    "updatedAt": "2025-08-31T15:42:26.971Z"
+  }
+]
